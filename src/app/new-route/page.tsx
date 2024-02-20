@@ -1,9 +1,13 @@
 'use client'
 
+import { useMap } from '@/hooks/useMap'
 import type { FindPlaceFromTextResponseData } from '@googlemaps/google-maps-services-js'
-import { FormEvent } from 'react'
+import { FormEvent, useRef } from 'react'
 
 export default function NewRoutePage() {
+  const mapContainerRef = useRef<HTMLDivElement>(null)
+  const map = useMap(mapContainerRef)
+
   const handleSearchPlaces = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -44,17 +48,20 @@ export default function NewRoutePage() {
   }
 
   return (
-    <div>
-      <h1>Nova Rota</h1>
-      <form onSubmit={handleSearchPlaces} className="flex flex-col">
-        <div>
-          <input id="source" type="text" placeholder="Origem..." />
-        </div>
-        <div>
-          <input id="destination" type="text" placeholder="Destino..." />
-        </div>
-        <button type="submit">Pesquisar</button>
-      </form>
+    <div className="flex flex-row h-full w-full">
+      <div>
+        <h1>Nova Rota</h1>
+        <form onSubmit={handleSearchPlaces} className="flex flex-col">
+          <div>
+            <input id="source" type="text" placeholder="Origem..." />
+          </div>
+          <div>
+            <input id="destination" type="text" placeholder="Destino..." />
+          </div>
+          <button type="submit">Pesquisar</button>
+        </form>
+      </div>
+      <div ref={mapContainerRef} className="flex-1 bg-red-50"></div>
     </div>
   )
 }

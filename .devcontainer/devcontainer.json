@@ -30,7 +30,9 @@
 		"vscode": {
 			"extensions": [
 				"ms-azuretools.vscode-docker",
-				"dbaeumer.vscode-eslint"
+				"dbaeumer.vscode-eslint",
+				"bradlc.vscode-tailwindcss",
+				"esbenp.prettier-vscode"
 			]
 		}
 	}
