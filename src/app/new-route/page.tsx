@@ -18,7 +18,7 @@ export default function NewRoutePage() {
       fetch(`http://localhost:3000/places?text=${destiantionText}`),
     ])
 
-    const [sourcePlace, destiantionPlace]: FindPlaceFromTextResponseData[] =
+    const [sourcePlace, destinationPlace]: FindPlaceFromTextResponseData[] =
       await Promise.all([sourceResponse.json(), destiantionResponse.json()])
 
     if (sourcePlace.status !== 'OK') {
@@ -26,10 +26,21 @@ export default function NewRoutePage() {
       return alert('Não foi possível encontrar a origem')
     }
 
-    if (destiantionPlace.status !== 'OK') {
-      console.error(destiantionPlace)
+    if (destinationPlace.status !== 'OK') {
+      console.error(destinationPlace)
       return alert('Não foi possível encontrar o destino')
     }
+
+    const placeSourceId = sourcePlace.candidates[0].place_id
+    const placeDestinationId = destinationPlace.candidates[0].place_id
+
+    const directionsResponse = await fetch(
+      `http://localhost:3000/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`,
+    )
+
+    const directionsData = await directionsResponse.json()
+
+    console.log(directionsData)
   }
 
   return (
