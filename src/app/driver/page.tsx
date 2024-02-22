@@ -3,103 +3,52 @@
 import { useMap } from '@/hooks/useMap'
 import { fetcher } from '@/utils/http'
 import { Route } from '@/utils/model'
-import type {
-  DirectionsResponseData,
-  FindPlaceFromTextResponseData,
-} from '@googlemaps/google-maps-services-js'
-import { FormEvent, useRef, useState } from 'react'
+import { sleep } from '@/utils/sleep'
+import { useRef } from 'react'
 import useSWR from 'swr'
-
-interface IDirectionsResponseData extends DirectionsResponseData {
-  request: any
-}
 
 export default function DriverPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const map = useMap(mapContainerRef)
-  const [directionsData, setDirectionsData] =
-    useState<IDirectionsResponseData>()
 
-  const {
-    data: routes,
-    error,
-    isLoading,
-  } = useSWR<Route[]>('http://localhost:3000/routes', fetcher, {
-    fallback: [],
-  })
+  const { data: routes, isLoading } = useSWR<Route[]>(
+    'http://localhost:3000/routes',
+    fetcher,
+    {
+      fallback: [],
+    },
+  )
 
-  const handleSearchPlaces = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    const sourceText = (document.getElementById('source') as HTMLInputElement)
+  const handleStartRoute = async () => {
+    const routeId = (document.getElementById('route') as HTMLSelectElement)
       .value
-    const destiantionText = (
-      document.getElementById('destination') as HTMLInputElement
-    ).value
+    const response = await fetch(`http://localhost:3000/routes/${routeId}`)
+    const route: Route = await response.json()
 
-    const [sourceResponse, destiantionResponse] = await Promise.all([
-      fetch(`http://localhost:3000/places?text=${sourceText}`),
-      fetch(`http://localhost:3000/places?text=${destiantionText}`),
-    ])
-
-    const [sourcePlace, destinationPlace]: FindPlaceFromTextResponseData[] =
-      await Promise.all([sourceResponse.json(), destiantionResponse.json()])
-
-    if (sourcePlace.status !== 'OK') {
-      console.error(sourcePlace)
-      return alert('Não foi possível encontrar a origem')
-    }
-
-    if (destinationPlace.status !== 'OK') {
-      console.error(destinationPlace)
-      return alert('Não foi possível encontrar o destino')
-    }
-
-    const placeSourceId = sourcePlace.candidates[0].place_id
-    const placeDestinationId = destinationPlace.candidates[0].place_id
-
-    const directionsResponse = await fetch(
-      `http://localhost:3000/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`,
-    )
-
-    const directionsData: IDirectionsResponseData =
-      await directionsResponse.json()
-
-    setDirectionsData(directionsData)
     map?.removeAllRoutes()
 
     await map?.addRouteWithIcons({
-      routeId: '1',
+      routeId,
       startMarkerOptions: {
-        position: directionsData.routes[0].legs[0].start_location,
+        position: route.directions.routes[0].legs[0].start_location,
       },
       endMarkerOptions: {
-        position: directionsData.routes[0].legs[0].end_location,
+        position: route.directions.routes[0].legs[0].end_location,
       },
       carMarkerOptions: {
-        position: directionsData.routes[0].legs[0].start_location,
+        position: route.directions.routes[0].legs[0].start_location,
       },
     })
-  }
 
-  const handleCreateRoute = async () => {
-    const startAddress = directionsData!.routes[0].legs[0].start_address
-    const destinationAddress = directionsData!.routes[0].legs[0].end_address
+    const { steps } = route.directions.routes[0].legs[0]
 
-    const response = await fetch('http://localhost:3000/routes', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: `${startAddress} - ${destinationAddress}`,
-        source_id: directionsData!.request.origin.place_id,
-        destination_id: directionsData!.request.destination.place_id,
-      }),
-    })
+    for (const step of steps) {
+      await sleep(2000)
+      map?.moveCar(routeId, step.start_location)
 
-    const route = await response.json()
-    console.log(route)
+      await sleep(2000)
+      map?.moveCar(routeId, step.end_location)
+    }
   }
 
   return (
@@ -116,7 +65,9 @@ export default function DriverPage() {
                 </option>
               ))}
           </select>
-          <button type="submit">Iniciar viagem</button>
+          <button type="submit" onClick={handleStartRoute}>
+            Iniciar viagem
+          </button>
         </div>
       </div>
       <div ref={mapContainerRef} className="flex-1 bg-red-50"></div>
