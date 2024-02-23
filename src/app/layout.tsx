@@ -1,8 +1,6 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry'
 import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Vehicle Tacking',
@@ -16,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} h-screen w-screen`}>{children}</body>
+      <body className="h-screen w-screen">
+        <ThemeRegistry>{children}</ThemeRegistry>
+      </body>
     </html>
   )
 }

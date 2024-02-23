@@ -5,6 +5,7 @@ import { fetcher } from '@/utils/http'
 import { Route } from '@/utils/model'
 import { sleep } from '@/utils/sleep'
 import { socket } from '@/utils/socket-io'
+import { Button } from '@mui/material'
 import { useEffect, useRef } from 'react'
 import useSWR from 'swr'
 
@@ -71,7 +72,8 @@ export default function DriverPage() {
   }
 
   return (
-    <div className="flex flex-row h-full w-full">
+    <div className="flex flex-row h-screen">
+      <Button>sss</Button>
       <div>
         <h1>Minha Viagem</h1>
         <div className="flex flex-col">
