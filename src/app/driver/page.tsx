@@ -13,7 +13,7 @@ export default function DriverPage() {
   const map = useMap(mapContainerRef)
 
   const { data: routes, isLoading } = useSWR<Route[]>(
-    'http://localhost:3000/routes',
+    'http://localhost:3001/routes',
     fetcher,
     {
       fallback: [],
@@ -31,7 +31,7 @@ export default function DriverPage() {
   const handleStartRoute = async () => {
     const routeId = (document.getElementById('route') as HTMLSelectElement)
       .value
-    const response = await fetch(`http://localhost:3000/routes/${routeId}`)
+    const response = await fetch(`http://localhost:3001/routes/${routeId}`)
     const route: Route = await response.json()
 
     map?.removeAllRoutes()
