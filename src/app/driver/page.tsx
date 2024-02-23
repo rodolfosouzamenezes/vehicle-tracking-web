@@ -4,7 +4,8 @@ import { useMap } from '@/hooks/useMap'
 import { fetcher } from '@/utils/http'
 import { Route } from '@/utils/model'
 import { sleep } from '@/utils/sleep'
-import { useRef } from 'react'
+import { socket } from '@/utils/socket-io'
+import { useEffect, useRef } from 'react'
 import useSWR from 'swr'
 
 export default function DriverPage() {
@@ -18,6 +19,14 @@ export default function DriverPage() {
       fallback: [],
     },
   )
+
+  useEffect(() => {
+    socket.connect()
+
+    return () => {
+      socket.disconnect()
+    }
+  }, [])
 
   const handleStartRoute = async () => {
     const routeId = (document.getElementById('route') as HTMLSelectElement)
@@ -45,9 +54,19 @@ export default function DriverPage() {
     for (const step of steps) {
       await sleep(2000)
       map?.moveCar(routeId, step.start_location)
+      socket.emit('new-points', {
+        route_id: routeId,
+        lat: step.start_location.lat,
+        lng: step.start_location.lng,
+      })
 
       await sleep(2000)
       map?.moveCar(routeId, step.end_location)
+      socket.emit('new-points', {
+        route_id: routeId,
+        lat: step.end_location.lat,
+        lng: step.end_location.lng,
+      })
     }
   }
 
