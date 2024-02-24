@@ -37,8 +37,8 @@ export default function NewRoutePage() {
     ).value
 
     const [sourceResponse, destiantionResponse] = await Promise.all([
-      fetch(`http://localhost:3001/places?text=${sourceText}`),
-      fetch(`http://localhost:3001/places?text=${destiantionText}`),
+      fetch(`http://localhost:3000/api/places?text=${sourceText}`),
+      fetch(`http://localhost:3000/api/places?text=${destiantionText}`),
     ])
 
     const [sourcePlace, destinationPlace]: FindPlaceFromTextResponseData[] =
@@ -58,7 +58,7 @@ export default function NewRoutePage() {
     const placeDestinationId = destinationPlace.candidates[0].place_id
 
     const directionsResponse = await fetch(
-      `http://localhost:3001/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`,
+      `http://localhost:3000/api/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`,
     )
 
     const directionsData: IDirectionsResponseData =
@@ -85,7 +85,7 @@ export default function NewRoutePage() {
     const startAddress = directionsData!.routes[0].legs[0].start_address
     const destinationAddress = directionsData!.routes[0].legs[0].end_address
 
-    const response = await fetch('http://localhost:3001/routes', {
+    const response = await fetch('http://localhost:3000/api/routes', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ export default function NewRoutePage() {
             fullWidth
             sx={{ marginBottom: 2 }}
           />
-          <Button variant="contained" fullWidth>
+          <Button variant="contained" type="submit" fullWidth>
             Pesquisar
           </Button>
         </form>

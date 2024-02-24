@@ -25,7 +25,7 @@ const defaultTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         'html, body': {
-          minHeight: '100vh',
+          height: '100vh',
           display: 'flex',
           flex: 1,
           flexDirection: 'column',

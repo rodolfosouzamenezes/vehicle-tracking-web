@@ -6,7 +6,7 @@ import { NativeSelect, NativeSelectProps } from '@mui/material'
 import useSWR from 'swr'
 
 export async function getRoutes(): Promise<Route[]> {
-  const response = await fetch('http://localhost:3000/routes')
+  const response = await fetch('http://localhost:3000/api/routes')
 
   return await response.json()
 }
@@ -17,7 +17,7 @@ export type RouteSelectProps = NativeSelectProps & {
 
 export function RouteSelect({ onChange, ...props }: RouteSelectProps) {
   const { data: routes, isLoading } = useSWR<Route[]>(
-    'http://localhost:3001/routes',
+    'http://localhost:3001/api/routes',
     fetcher,
     {
       fallback: [],
