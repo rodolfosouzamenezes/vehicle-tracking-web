@@ -50,7 +50,7 @@ export default function AdminPage() {
   }, [map])
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex h-screen">
       <div ref={mapContainerRef} className="flex-1 bg-red-50"></div>
     </div>
   )

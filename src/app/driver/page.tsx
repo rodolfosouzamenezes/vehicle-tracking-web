@@ -1,25 +1,19 @@
 'use client'
 
+import { RouteSelect } from '@/components/RouteSelect'
 import { useMap } from '@/hooks/useMap'
-import { fetcher } from '@/utils/http'
 import { Route } from '@/utils/model'
 import { sleep } from '@/utils/sleep'
 import { socket } from '@/utils/socket-io'
-import { Button } from '@mui/material'
-import { useEffect, useRef } from 'react'
-import useSWR from 'swr'
+import { Alert, Button, Snackbar, Typography } from '@mui/material'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
+import { useEffect, useRef, useState } from 'react'
 
 export default function DriverPage() {
+  const [open, setOpen] = useState(false)
+
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const map = useMap(mapContainerRef)
-
-  const { data: routes, isLoading } = useSWR<Route[]>(
-    'http://localhost:3001/routes',
-    fetcher,
-    {
-      fallback: [],
-    },
-  )
 
   useEffect(() => {
     socket.connect()
@@ -72,26 +66,35 @@ export default function DriverPage() {
   }
 
   return (
-    <div className="flex flex-row h-screen">
-      <Button>sss</Button>
-      <div>
-        <h1>Minha Viagem</h1>
-        <div className="flex flex-col">
-          <select id="route">
-            {isLoading && <option>Carregando rotas...</option>}
-            {routes &&
-              routes.map((route) => (
-                <option key={route.id} value={route.id}>
-                  {route.name}
-                </option>
-              ))}
-          </select>
-          <button type="submit" onClick={handleStartRoute}>
+    <Grid2 container sx={{ display: 'flex', flex: 1 }}>
+      <Grid2
+        xs={4}
+        p={4}
+        alignItems="center"
+        gap={4}
+        display="flex"
+        flexDirection="column"
+      >
+        <Typography variant="h4" textTransform="uppercase">
+          Minha Viagem
+        </Typography>
+        <div className="flex flex-col space-y-4">
+          <RouteSelect id="route" />
+          <Button variant="contained" onClick={handleStartRoute}>
             Iniciar viagem
-          </button>
+          </Button>
         </div>
-      </div>
-      <div ref={mapContainerRef} className="flex-1 bg-red-50"></div>
-    </div>
+      </Grid2>
+      <Grid2 ref={mapContainerRef} xs={8}></Grid2>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={() => setOpen(false)}
+      >
+        <Alert onClose={() => setOpen(false)} severity="success">
+          Rota cadastrada com sucesso
+        </Alert>
+      </Snackbar>
+    </Grid2>
   )
 }

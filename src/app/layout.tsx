@@ -1,3 +1,4 @@
+import { Navbar } from '@/components/Navbar'
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry'
 import './globals.css'
 import type { Metadata } from 'next'
@@ -14,8 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="h-screen w-screen">
-        <ThemeRegistry>{children}</ThemeRegistry>
+      <body className="flex h-screen w-screen">
+        <ThemeRegistry>
+          <Navbar />
+          {children}
+        </ThemeRegistry>
       </body>
     </html>
   )

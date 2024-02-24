@@ -1,17 +1,27 @@
 'use client'
 
+import { IDirectionsResponseData } from '@/@types/maps'
 import { useMap } from '@/hooks/useMap'
-import type {
-  DirectionsResponseData,
-  FindPlaceFromTextResponseData,
-} from '@googlemaps/google-maps-services-js'
+import type { FindPlaceFromTextResponseData } from '@googlemaps/google-maps-services-js'
+import {
+  Alert,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  List,
+  ListItem,
+  ListItemText,
+  Snackbar,
+  TextField,
+  Typography,
+} from '@mui/material'
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2'
 import { FormEvent, useRef, useState } from 'react'
 
-interface IDirectionsResponseData extends DirectionsResponseData {
-  request: any
-}
-
 export default function NewRoutePage() {
+  const [open, setOpen] = useState(false)
+
   const mapContainerRef = useRef<HTMLDivElement>(null)
   const map = useMap(mapContainerRef)
   const [directionsData, setDirectionsData] =
@@ -88,33 +98,107 @@ export default function NewRoutePage() {
     })
 
     const route = await response.json()
-    console.log(route)
+    route && setOpen(true)
   }
 
   return (
-    <div className="flex flex-row h-full w-full">
-      <div>
-        <h1>Nova Rota</h1>
-        <form onSubmit={handleSearchPlaces} className="flex flex-col">
-          <div>
-            <input id="source" type="text" placeholder="Origem..." />
-          </div>
-          <div>
-            <input id="destination" type="text" placeholder="Destino..." />
-          </div>
-          <button type="submit">Pesquisar</button>
+    <Grid2 container sx={{ display: 'flex', flex: 1 }}>
+      <Grid2
+        xs={4}
+        p={4}
+        alignItems="center"
+        gap={4}
+        display="flex"
+        flexDirection="column"
+      >
+        <Typography variant="h4" textTransform="uppercase">
+          Nova Rota
+        </Typography>
+        <form onSubmit={handleSearchPlaces}>
+          <TextField
+            id="source"
+            label="Origem"
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+
+          <TextField
+            id="destination"
+            label="Destino"
+            fullWidth
+            sx={{ marginBottom: 2 }}
+          />
+          <Button variant="contained" fullWidth>
+            Pesquisar
+          </Button>
         </form>
         {directionsData && (
-          <ul>
-            <li>Origem {directionsData.routes[0].legs[0].start_address}</li>
-            <li>Destino {directionsData.routes[0].legs[0].end_address}</li>
-            <li>
-              <button onClick={handleCreateRoute}>Criar rota</button>
-            </li>
-          </ul>
+          <Card sx={{ mt: 1, width: '100%' }}>
+            <CardContent>
+              <List>
+                <ListItem>
+                  <ListItemText
+                    primary={'Origem'}
+                    secondary={
+                      directionsData?.routes[0]!.legs[0]!.start_address
+                    }
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={'Destino'}
+                    secondary={directionsData?.routes[0]!.legs[0]!.end_address}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={'Distância'}
+                    secondary={
+                      directionsData?.routes[0]!.legs[0]!.distance.text
+                    }
+                  />
+                </ListItem>
+                <ListItem>
+                  <ListItemText
+                    primary={'Duração'}
+                    secondary={
+                      directionsData?.routes[0]!.legs[0]!.duration.text
+                    }
+                  />
+                </ListItem>
+              </List>
+            </CardContent>
+            <CardActions
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+                px: 4,
+                pb: 4,
+              }}
+            >
+              <Button
+                type="button"
+                variant="contained"
+                onClick={handleCreateRoute}
+                fullWidth
+              >
+                Adicionar rota
+              </Button>
+            </CardActions>
+          </Card>
         )}
-      </div>
-      <div ref={mapContainerRef} className="flex-1 bg-red-50"></div>
-    </div>
+      </Grid2>
+      <Grid2 ref={mapContainerRef} xs={8}></Grid2>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={() => setOpen(false)}
+      >
+        <Alert onClose={() => setOpen(false)} severity="success">
+          Rota cadastrada com sucesso
+        </Alert>
+      </Snackbar>
+    </Grid2>
   )
 }
