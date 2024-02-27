@@ -18,7 +18,7 @@ export default function AdminPage() {
 
         if (!map?.hasRoute(data.route_id)) {
           const response = await fetch(
-            `http://localhost:3001/api/routes/${data.route_id}`,
+            `http://localhost:3000/api/routes/${data.route_id}`,
           )
           const route: Route = await response.json()
 

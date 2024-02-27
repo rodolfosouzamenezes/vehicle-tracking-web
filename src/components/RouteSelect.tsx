@@ -17,7 +17,7 @@ export type RouteSelectProps = NativeSelectProps & {
 
 export function RouteSelect({ onChange, ...props }: RouteSelectProps) {
   const { data: routes, isLoading } = useSWR<Route[]>(
-    'http://localhost:3001/api/routes',
+    'http://localhost:3000/api/routes',
     fetcher,
     {
       fallback: [],
